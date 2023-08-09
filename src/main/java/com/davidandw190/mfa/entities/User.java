@@ -59,6 +59,7 @@ public class User implements UserDetails {
         return this.password;
     }
 
+    /* From the Security perspective, the user identification will be done through its email */
     @Override
     public String getUsername() {
         return this.email;
