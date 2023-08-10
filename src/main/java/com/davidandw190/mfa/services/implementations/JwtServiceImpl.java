@@ -1,5 +1,6 @@
-package com.davidandw190.mfa.config;
+package com.davidandw190.mfa.services.implementations;
 
+import com.davidandw190.mfa.services.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -18,7 +19,7 @@ import java.util.function.Function;
  * Service class for handling JWT (JSON Web Token) related operations.
  */
 @Service
-public class JwtService {
+public class JwtServiceImpl implements JwtService {
 
     @Value("${jwt.secret}")
     private static String SECRET_KEY;
@@ -30,6 +31,7 @@ public class JwtService {
      * @param userDetails UserDetails of the user for whom the token is being generated.
      * @return Generated JWT token as a String.
      */
+    @Override
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
                 .setClaims(extraClaims)
@@ -48,6 +50,7 @@ public class JwtService {
      * @param <T>            Type of the claim value.
      * @return The extracted claim value.
      */
+    @Override
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -60,6 +63,7 @@ public class JwtService {
      * @param userDetails UserDetails of the user against which to validate the token.
      * @return True if the token is valid for the user, otherwise false.
      */
+    @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
@@ -71,6 +75,7 @@ public class JwtService {
      * @param token JWT token from which to extract the username.
      * @return Extracted username.
      */
+    @Override
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }

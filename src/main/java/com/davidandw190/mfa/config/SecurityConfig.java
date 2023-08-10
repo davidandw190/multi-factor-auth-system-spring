@@ -1,5 +1,6 @@
 package com.davidandw190.mfa.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -16,6 +17,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFiler;
     private final AuthenticationProvider authProvider;
 
+    @Autowired
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFiler, AuthenticationProvider authProvider) {
         this.jwtAuthFiler = jwtAuthFiler;
         this.authProvider = authProvider;
@@ -34,7 +36,7 @@ public class SecurityConfig {
             .authenticationProvider(authProvider)
             .addFilterBefore(jwtAuthFiler, UsernamePasswordAuthenticationFilter.class);
 
-         return  http.build();
+         return http.build();
     }
 
 }
