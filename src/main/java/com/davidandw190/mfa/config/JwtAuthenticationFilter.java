@@ -1,5 +1,6 @@
 package com.davidandw190.mfa.config;
 
+import com.davidandw190.mfa.services.JwtService;
 import com.davidandw190.mfa.services.implementations.JwtServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,7 +24,7 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtServiceImpl jwtService;
+    private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
     @Autowired
