@@ -3,6 +3,9 @@ package com.davidandw190.mfa.domain;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Represents a new user`s registration request.
+ */
 @Data
 @Builder
 public class RegistrationRequest {

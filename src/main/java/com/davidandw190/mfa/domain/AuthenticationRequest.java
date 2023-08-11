@@ -3,6 +3,9 @@ package com.davidandw190.mfa.domain;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Represents a user's authentication request containing email and password.
+ */
 @Data
 @Builder
 public class AuthenticationRequest {

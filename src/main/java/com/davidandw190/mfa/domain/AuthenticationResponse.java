@@ -4,6 +4,9 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
 
+/**
+ * Represents a response containing an authentication token.
+ */
 @Data
 @Builder
 public class AuthenticationResponse {
