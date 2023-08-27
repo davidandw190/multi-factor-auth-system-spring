@@ -1,0 +1,30 @@
+spring:
+
+  # Profile
+  profiles:
+    active: ${ACTIVE_PROFILE:dev}
+
+  # Database
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DB}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+
+  # Persistence
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: ${DDL_POLICY}
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+
+        jdbc:
+          time_zone: EET
+
+# Security
+jwt:
+  secret: ${JWT_SECRET}
