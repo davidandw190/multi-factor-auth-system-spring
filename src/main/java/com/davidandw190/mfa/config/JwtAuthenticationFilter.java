@@ -1,5 +1,6 @@
 package com.davidandw190.mfa.config;
 
+import com.davidandw190.mfa.repositories.TokenRepository;
 import com.davidandw190.mfa.services.JwtService;
 import com.davidandw190.mfa.services.implementations.JwtServiceImpl;
 import jakarta.servlet.FilterChain;
@@ -26,11 +27,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenRepository tokenRepository;
 
     @Autowired
-    public JwtAuthenticationFilter(JwtServiceImpl jwtService, UserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(JwtServiceImpl jwtService, UserDetailsService userDetailsService, TokenRepository tokenRepository) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.tokenRepository = tokenRepository;
     }
 
     /**
@@ -49,21 +52,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
         final String userEmail;
-        final String token;
+        final String jwt;
 
         if ((authHeader == null) || (!authHeader.startsWith("Bearer "))) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        token = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(token);
+        jwt = authHeader.substring(7);
+        userEmail = jwtService.extractUsername(jwt);
 
         if ((userEmail != null) && (SecurityContextHolder.getContext().getAuthentication() == null)) {
             /* Again, we use the user email as a username from the security perspective */
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
-            if (jwtService.isTokenValid(token, userDetails)) {
+            var isTokenValid = tokenRepository.findByToken(jwt)
+                    .map(t -> !t.isExpired() && !t.isRevoked())
+                    .orElse(false);
+
+
+            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                 var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
