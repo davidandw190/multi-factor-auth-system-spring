@@ -3,14 +3,16 @@ package com.davidandw190.mfa.services.implementations;
 import com.davidandw190.mfa.domain.AuthenticationRequest;
 import com.davidandw190.mfa.domain.AuthenticationResponse;
 import com.davidandw190.mfa.domain.RegistrationRequest;
+import com.davidandw190.mfa.entities.Token;
 import com.davidandw190.mfa.entities.User;
 import com.davidandw190.mfa.enums.Role;
+import com.davidandw190.mfa.enums.TokenType;
+import com.davidandw190.mfa.repositories.TokenRepository;
 import com.davidandw190.mfa.repositories.UserRepository;
 import com.davidandw190.mfa.services.AuthenticationService;
 import com.davidandw190.mfa.services.JwtService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.ExpressionException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,13 +30,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authManager;
+    private final TokenRepository tokenRepository;
 
     @Autowired
-    public AuthenticationServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authManager) {
+    public AuthenticationServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authManager, TokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authManager = authManager;
+        this.tokenRepository = tokenRepository;
     }
 
 
@@ -63,9 +67,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         userRepository.save(newRegisteredUser);
-        String token = jwtService.generateToken(newRegisteredUser);
+        String jwtToken = jwtService.generateToken(newRegisteredUser);
 
-        return AuthenticationResponse.builder().token(token).build();
+        saveUserToken(newRegisteredUser, jwtToken);
+
+        return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
     /**
@@ -78,22 +84,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public AuthenticationResponse authenticateUser(AuthenticationRequest request) {
 
-        authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(
                 () -> new RuntimeException("User with email `" + request.getEmail() + "` was not found!")
         );
 
-        var jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateToken(user);
+        saveUserToken(user, jwtToken);
 
         return AuthenticationResponse.builder().token(jwtToken).build();
 
+    }
 
+    private void saveUserToken(User savedUser, String jwtToken) {
+        Token token = Token.builder()
+                .user(savedUser)
+                .token(jwtToken)
+                .type(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+
+        tokenRepository.save(token);
     }
 
 }
