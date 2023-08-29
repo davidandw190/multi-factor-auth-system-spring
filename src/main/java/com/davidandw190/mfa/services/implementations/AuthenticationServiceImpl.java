@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -90,6 +91,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 () -> new RuntimeException("User with email `" + request.getEmail() + "` was not found!")
         );
 
+        revokeAllUserTokens(user);
         String jwtToken = jwtService.generateToken(user);
         saveUserToken(user, jwtToken);
 
@@ -107,6 +109,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
 
         tokenRepository.save(token);
+    }
+
+    private void revokeAllUserTokens(User user) {
+        List<Token> validTokens = tokenRepository.findAllValidTokensByUser(user.getId());
+
+        if (!(validTokens.isEmpty())) {
+            validTokens.forEach(t -> { t.setRevoked(true); });
+        }
     }
 
 }
