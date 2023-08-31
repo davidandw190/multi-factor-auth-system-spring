@@ -7,6 +7,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service for handling user logout by revoking tokens.
+ */
 @Service
 public class LogoutService implements LogoutHandler {
 
@@ -16,6 +19,14 @@ public class LogoutService implements LogoutHandler {
         this.tokenRepository = tokenRepository;
     }
 
+
+    /**
+     * Logs the user out by revoking the token.
+     *
+     * @param request The HTTP request.
+     * @param response The HTTP response.
+     * @param authentication The authentication object.
+     */
     @Override
     public void logout(
             HttpServletRequest request,

@@ -39,21 +39,44 @@ public class JwtServiceImpl implements JwtService {
 
     }
 
+
+    /**
+     * Generates a JWT token with additional claims and user details.
+     *
+     * @param extraClaims Additional claims to include in the token.
+     * @param userDetails User details for the token.
+     * @return The generated JWT token.
+     */
     @Override
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
 
         return buildToken(extraClaims, userDetails, TOKEN_EXPIRATION);
     }
 
+
+    /**
+     * Generates a JWT token with user details and no additional claims.
+     *
+     * @param userDetails User details for the token.
+     * @return The generated JWT token.
+     */
     @Override
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
+
+    /**
+     * Generates a refresh JWT token with user details and no additional claims.
+     *
+     * @param userDetails User details for the token.
+     * @return The generated refresh JWT token.
+     */
     @Override
     public String generateRefreshToken(UserDetails userDetails) {
         return buildToken(new HashMap<>(), userDetails, REFRESH_TOKEN_EXPIRATION);
     }
+
 
     /**
      * Extracts a specific claim from the provided JWT token.
@@ -69,6 +92,7 @@ public class JwtServiceImpl implements JwtService {
         return claimsResolver.apply(claims);
     }
 
+
     /**
      * Validates whether a JWT token is valid for the given user details.
      *
@@ -81,6 +105,7 @@ public class JwtServiceImpl implements JwtService {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
 
     /**
      * Extracts the username from a JWT token.
@@ -102,7 +127,6 @@ public class JwtServiceImpl implements JwtService {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
 
 
     private boolean isTokenExpired(String token) {

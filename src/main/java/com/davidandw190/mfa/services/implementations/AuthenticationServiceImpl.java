@@ -42,7 +42,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.tokenRepository = tokenRepository;
     }
 
-
+    /**
+     * Registers a new user based on the provided registration request.
+     *
+     * @param request The registration request containing user information.
+     * @return An AuthenticationResponse containing access and refresh tokens.
+     * @throws RuntimeException If a user with the provided email already exists.
+     */
     @Override
     @Transactional
     public AuthenticationResponse registerUser(RegistrationRequest request) {
@@ -72,7 +78,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
-
+    /**
+     * Authenticates a user based on the provided authentication request.
+     *
+     * @param request The authentication request containing user credentials.
+     * @return An AuthenticationResponse containing access and refresh tokens.
+     * @throws RuntimeException If the user with the provided email is not found or credentials are invalid.
+     */
     @Override
     public AuthenticationResponse authenticateUser(AuthenticationRequest request) {
 

@@ -7,6 +7,9 @@ import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * Represents an authentication token entity.
+ */
 @Data
 @Builder
 @Entity

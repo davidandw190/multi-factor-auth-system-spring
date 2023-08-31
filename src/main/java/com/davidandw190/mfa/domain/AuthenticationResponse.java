@@ -6,7 +6,7 @@ import lombok.Data;
 import org.springframework.security.core.Authentication;
 
 /**
- * Represents a response containing an authentication token.
+ * Represents a response containing an access token and a refresh token.
  */
 @Data
 @Builder
