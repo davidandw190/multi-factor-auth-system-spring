@@ -43,13 +43,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
 
-    /**
-     * Registers a new user.
-     *
-     * @param request The registration request containing user information.
-     * @return AuthenticationResponse containing a token upon successful registration.
-     * @throws RuntimeException If a user with the provided email already exists.
-     */
     @Override
     @Transactional
     public AuthenticationResponse registerUser(RegistrationRequest request) {
@@ -69,19 +62,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         userRepository.save(newRegisteredUser);
         String jwtToken = jwtService.generateToken(newRegisteredUser);
+        String refreshToken = jwtService.generateRefreshToken(newRegisteredUser);
 
         saveUserToken(newRegisteredUser, jwtToken);
 
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return AuthenticationResponse.builder()
+                .accessToken(jwtToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
-    /**
-     * Authenticates a user.
-     *
-     * @param request The authentication request containing user email and password.
-     * @return AuthenticationResponse containing a token upon successful authentication.
-     * @throws RuntimeException If the user is not found or authentication fails.
-     */
+
     @Override
     public AuthenticationResponse authenticateUser(AuthenticationRequest request) {
 
@@ -93,9 +84,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         revokeAllUserTokens(user);
         String jwtToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(user, jwtToken);
 
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return AuthenticationResponse.builder()
+                .accessToken(jwtToken)
+                .refreshToken(refreshToken)
+                .build();
 
     }
 

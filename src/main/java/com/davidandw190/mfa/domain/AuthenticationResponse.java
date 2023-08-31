@@ -1,5 +1,6 @@
 package com.davidandw190.mfa.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
@@ -11,12 +12,17 @@ import org.springframework.security.core.Authentication;
 @Builder
 public class AuthenticationResponse {
 
-    private String token;
+    @JsonProperty("access_token")
+    private String accessToken;
+
+    @JsonProperty("refresh_token")
+    private String refreshToken;
 
     public AuthenticationResponse() {}
 
-    public AuthenticationResponse(String token) {
-        this.token = token;
+    public AuthenticationResponse(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
 

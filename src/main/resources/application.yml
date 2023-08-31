@@ -1,3 +1,15 @@
+
+# Security
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET}
+      expiration: ${AUTH_TOKEN_EXPIRATION}
+
+      refresh-token:
+        expiration: ${REFRESH_TOKEN_EXPIRATION}
+
+
 spring:
 
   # Profile
@@ -25,6 +37,3 @@ spring:
         jdbc:
           time_zone: EET
 
-# Security
-jwt:
-  secret: ${JWT_SECRET}

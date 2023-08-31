@@ -24,33 +24,35 @@ import java.util.function.Function;
 public class JwtServiceImpl implements JwtService {
 
     private static String SECRET_KEY;
+    private static long TOKEN_EXPIRATION;
+    private static long REFRESH_TOKEN_EXPIRATION;
 
     @Autowired
-    public JwtServiceImpl(@Value("${jwt.secret}") String secretKey) {
+    public JwtServiceImpl(
+            @Value("${application.security.jwt.secret-key}") String secretKey,
+            @Value("${application.security.jwt.expiration}") long tokenExpiration,
+            @Value("${application.security.jwt.refresh-token.expiration}") long refreshExpiration) {
+
         SECRET_KEY = secretKey;
+        TOKEN_EXPIRATION = tokenExpiration;
+        REFRESH_TOKEN_EXPIRATION = refreshExpiration;
+
     }
 
-    /**
-     * Generates a JWT token with the provided extra claims and user details.
-     *
-     * @param extraClaims Additional claims to be included in the token payload.
-     * @param userDetails UserDetails of the user for whom the token is being generated.
-     * @return Generated JWT token as a String.
-     */
     @Override
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24 * 3)) // Token expiration: 3 days
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
+
+        return buildToken(extraClaims, userDetails, TOKEN_EXPIRATION);
     }
 
     @Override
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
+    }
+
+    @Override
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, REFRESH_TOKEN_EXPIRATION);
     }
 
     /**
@@ -90,6 +92,18 @@ public class JwtServiceImpl implements JwtService {
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
+
+    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration)  {
+        return Jwts.builder()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
