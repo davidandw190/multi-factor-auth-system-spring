@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -123,10 +122,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         final String refreshToken = authHeader.substring(7);
         final String userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
-            UserDetails user = userRepository.findUserByEmail(userEmail).orElseThrow(RuntimeException::new);
+            var user = userRepository.findUserByEmail(userEmail).orElseThrow(RuntimeException::new);
 
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
+                revokeAllUserTokens(user);
+                saveUserToken(user, accessToken);
                 var authResponse = AuthenticationResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
