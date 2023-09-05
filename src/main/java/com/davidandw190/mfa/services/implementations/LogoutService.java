@@ -3,6 +3,7 @@ package com.davidandw190.mfa.services.implementations;
 import com.davidandw190.mfa.repositories.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class LogoutService implements LogoutHandler {
             HttpServletResponse response,
             Authentication authentication) {
 
-        final String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;

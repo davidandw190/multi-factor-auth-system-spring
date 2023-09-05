@@ -27,6 +27,13 @@ public class SecurityConfig {
         this.logoutService = logoutService;
     }
 
+    /**
+     * Configures security filters and rules.
+     *
+     * @param http HttpSecurity instance to configure.
+     * @return A configured SecurityFilterChain.
+     * @throws Exception If there's an error configuring security.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
          http

@@ -48,11 +48,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     /**
-     * Registers a new user based on the provided registration request.
+     * Registers a new user.
      *
-     * @param request The registration request containing user information.
-     * @return An AuthenticationResponse containing access and refresh tokens.
-     * @throws RuntimeException If a user with the provided email already exists.
+     * @param request Registration request data.
+     * @return An AuthenticationResponse with access and refresh tokens.
      */
     @Override
     @Transactional
@@ -84,15 +83,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     /**
-     * Authenticates a user based on the provided authentication request.
+     * Authenticates a user.
      *
-     * @param request The authentication request containing user credentials.
-     * @return An AuthenticationResponse containing access and refresh tokens.
-     * @throws RuntimeException If the user with the provided email is not found or credentials are invalid.
+     * @param request Authentication request data.
+     * @return An AuthenticationResponse with access and refresh tokens.
      */
     @Override
     public AuthenticationResponse authenticateUser(AuthenticationRequest request) {
-
         authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(
@@ -108,12 +105,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
-
     }
 
+    /**
+     * Refreshes an access token.
+     *
+     * @param request  HttpServletRequest for extracting the refresh token.
+     * @param response HttpServletResponse for writing the new access token.
+     * @throws IOException If there's an error writing to the response.
+     */
     @Override
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
@@ -133,11 +135,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .refreshToken(refreshToken)
                         .build();
 
-                new ObjectMapper().writeValue(response.getOutputStream(), response);
+                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
-
-
     }
 
     private void saveUserToken(User savedUser, String jwtToken) {
@@ -155,9 +155,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private void revokeAllUserTokens(User user) {
         List<Token> validTokens = tokenRepository.findAllValidTokensByUser(user.getId());
 
-        if (!(validTokens.isEmpty())) {
-            validTokens.forEach(t -> { t.setRevoked(true); });
+        if (!validTokens.isEmpty()) {
+            validTokens.forEach(t -> t.setRevoked(true));
         }
     }
-
 }

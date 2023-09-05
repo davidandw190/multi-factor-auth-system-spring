@@ -39,9 +39,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * Performs the token validation and sets the authentication context for the user.
      *
-     * @param request     HTTP servlet request.
-     * @param response    HTTP servlet response.
-     * @param filterChain Filter chain for request processing.
+     * @param request           HTTP servlet request.
+     * @param response          HTTP servlet response.
+     * @param filterChain       Filter chain for request processing.
      * @throws IOException      If an I/O error occurs during request or response handling.
      * @throws ServletException If any servlet-related error occurs.
      */
