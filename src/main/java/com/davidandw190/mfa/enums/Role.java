@@ -13,6 +13,7 @@ import static com.davidandw190.mfa.enums.Permission.*;
 /**
  * Enumeration representing user roles with associated permissions.
  */
+@Getter
 public enum Role {
     USER(Collections.emptySet()),
     ADMIN(Set.of(
@@ -42,8 +43,8 @@ public enum Role {
 
     public List<SimpleGrantedAuthority> getAuthorities() {
         var authorities = new java.util.ArrayList<>(getPermissions().stream()
-                .map(permission -> new SimpleGrantedAuthority(permission.name()))
-                .toList());
+                .map(permission -> new SimpleGrantedAuthority(permission.getValue()))
+                .collect(Collectors.toList()));
 
         authorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
 

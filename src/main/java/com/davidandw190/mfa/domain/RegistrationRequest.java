@@ -1,5 +1,7 @@
 package com.davidandw190.mfa.domain;
 
+import com.davidandw190.mfa.enums.Role;
+import jakarta.persistence.Enumerated;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,6 +16,7 @@ public class RegistrationRequest {
     private String lastname;
     private String email;
     private String password;
+    private Role role;
 
     public RegistrationRequest() {}
 
