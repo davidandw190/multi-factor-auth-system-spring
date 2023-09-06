@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,6 +20,7 @@ import static com.davidandw190.mfa.enums.Role.MANAGER;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFiler;
@@ -45,20 +47,20 @@ public class SecurityConfig {
                  .csrf().disable()
                  .authorizeHttpRequests()
                  .requestMatchers("/auth/**").permitAll()
-                 .requestMatchers("/management/**").hasAnyRole(ADMIN.name(), MANAGER.name())
-                 .requestMatchers("/admin/**").hasRole(ADMIN.name())
+//                 .requestMatchers("/management/**").hasAnyRole(ADMIN.name(), MANAGER.name())
+//                 .requestMatchers("/admin/**").hasRole(ADMIN.name())
+//
+//
+//                 .requestMatchers(HttpMethod.POST, "/management/**").hasAnyAuthority(ADMIN_CREATE.name(), MANAGEMENT_CREATE.name())
+//                 .requestMatchers(HttpMethod.GET, "/management/**").hasAnyAuthority(ADMIN_READ.name(), MANAGEMENT_READ.name())
+//                 .requestMatchers(HttpMethod.PUT, "/management/**").hasAnyAuthority(ADMIN_UPDATE.name(), MANAGEMENT_UPDATE.name())
+//                 .requestMatchers(HttpMethod.DELETE, "/management/**").hasAnyAuthority(ADMIN_DELETE.name(), MANAGEMENT_DELETE.name())
 
-
-                 .requestMatchers(HttpMethod.POST, "/management/**").hasAnyAuthority(ADMIN_CREATE.name(), MANAGEMENT_CREATE.name())
-                 .requestMatchers(HttpMethod.GET, "/management/**").hasAnyAuthority(ADMIN_READ.name(), MANAGEMENT_READ.name())
-                 .requestMatchers(HttpMethod.PUT, "/management/**").hasAnyAuthority(ADMIN_UPDATE.name(), MANAGEMENT_UPDATE.name())
-                 .requestMatchers(HttpMethod.DELETE, "/management/**").hasAnyAuthority(ADMIN_DELETE.name(), MANAGEMENT_DELETE.name())
-
-                 .requestMatchers(HttpMethod.POST, "/admin/**").hasAuthority(ADMIN_CREATE.name())
-                 .requestMatchers(HttpMethod.GET, "/admin/**").hasAnyAuthority(ADMIN_READ.name())
-                 .requestMatchers(HttpMethod.PUT, "/admin/**").hasAuthority(ADMIN_UPDATE.name())
-                 .requestMatchers(HttpMethod.DELETE, "/admin/**").hasAuthority(ADMIN_DELETE.name())
-
+//                 .requestMatchers(HttpMethod.POST, "/admin/**").hasAuthority(ADMIN_CREATE.name())
+//                 .requestMatchers(HttpMethod.GET, "/admin/**").hasAnyAuthority(ADMIN_READ.name())
+//                 .requestMatchers(HttpMethod.PUT, "/admin/**").hasAuthority(ADMIN_UPDATE.name())
+//                 .requestMatchers(HttpMethod.DELETE, "/admin/**").hasAuthority(ADMIN_DELETE.name())
+//
 
                  .anyRequest().authenticated()
                  .and()
