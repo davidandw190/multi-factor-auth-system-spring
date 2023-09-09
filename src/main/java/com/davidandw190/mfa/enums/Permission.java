@@ -1,6 +1,8 @@
 package com.davidandw190.mfa.enums;
 
+import lombok.Getter;
 
+@Getter
 public enum Permission {
     ADMIN_READ("admin:read"),
     ADMIN_CREATE("admin:create"),
@@ -16,10 +18,6 @@ public enum Permission {
 
     Permission(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return this.value;
     }
 
 }

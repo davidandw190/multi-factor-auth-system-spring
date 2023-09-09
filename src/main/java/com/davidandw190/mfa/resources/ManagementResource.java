@@ -4,7 +4,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
- *  Just some dummy Administration endpoints for implementing role based access
+ *  Just some dummy Management endpoints for implementing role based access
  */
 @RestController
 @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")

@@ -5,7 +5,6 @@ import com.davidandw190.mfa.domain.AuthenticationResponse;
 import com.davidandw190.mfa.domain.RegistrationRequest;
 import com.davidandw190.mfa.entities.Token;
 import com.davidandw190.mfa.entities.User;
-import com.davidandw190.mfa.enums.Role;
 import com.davidandw190.mfa.enums.TokenType;
 import com.davidandw190.mfa.repositories.TokenRepository;
 import com.davidandw190.mfa.repositories.UserRepository;
@@ -156,7 +155,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         List<Token> validTokens = tokenRepository.findAllValidTokensByUser(user.getId());
 
         if (!validTokens.isEmpty()) {
-            validTokens.forEach(t -> t.setRevoked(true));
+            validTokens.forEach(t -> {
+                t.setRevoked(true);
+                tokenRepository.save(t);
+            });
+
         }
     }
 }

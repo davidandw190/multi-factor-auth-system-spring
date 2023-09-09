@@ -1,9 +1,10 @@
 package com.davidandw190.mfa.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.security.core.Authentication;
+
 
 /**
  * Represents a response containing an access token and a refresh token.
@@ -15,7 +16,7 @@ public class AuthenticationResponse {
     @JsonProperty("access_token")
     private String accessToken;
 
-    @JsonProperty("refresh_token")
+    @JsonProperty(value = "refresh_token")
     private String refreshToken;
 
     public AuthenticationResponse() {}
