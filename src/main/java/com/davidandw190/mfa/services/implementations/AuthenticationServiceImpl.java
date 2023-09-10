@@ -61,6 +61,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
+                .mfaEnabled(request.isMfaEnabled())
                 .build();
 
         Optional<User> possiblyRegisteredUser = userRepository.findUserByEmail(request.getEmail());
@@ -68,7 +69,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (possiblyRegisteredUser.isPresent()) {
             throw new RuntimeException("User with email `" + request.getEmail() + "` already exists!");
         }
-
+        if (request.isMfaEnabled()) {
+            // TODO Add secret generation
+            newRegisteredUser.setSecret("");
+        }
         userRepository.save(newRegisteredUser);
         String jwtToken = jwtService.generateToken(newRegisteredUser);
         String refreshToken = jwtService.generateRefreshToken(newRegisteredUser);
@@ -78,6 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .mfaEnabled(newRegisteredUser.isMfaEnabled())
                 .build();
     }
 

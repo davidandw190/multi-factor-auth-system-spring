@@ -42,6 +42,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private ArrayList<Token> tokens;
 
+    // for mfa auth
+    private boolean mfaEnabled;
+    private String secret;
+
 
     public User() {}
 

@@ -25,13 +25,6 @@ public class RegistrationRequest {
     private String password;
     @NotNull
     private Role role;
-
-    public RegistrationRequest() {}
-
-    public RegistrationRequest(String firstname, String lastname, String email, String password) {
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.email = email;
-        this.password = password;
-    }
+    @JsonProperty(value = "mfa_enabled")
+    private boolean mfaEnabled;
 }

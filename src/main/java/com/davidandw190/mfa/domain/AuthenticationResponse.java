@@ -19,12 +19,7 @@ public class AuthenticationResponse {
     @JsonProperty(value = "refresh_token")
     private String refreshToken;
 
-    public AuthenticationResponse() {}
-
-    public AuthenticationResponse(String accessToken, String refreshToken) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-    }
-
+    @JsonProperty(value = "mfa_enabled")
+    private boolean mfaEnabled;
 
 }
