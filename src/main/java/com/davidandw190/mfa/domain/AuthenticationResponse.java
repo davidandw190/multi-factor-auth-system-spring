@@ -1,5 +1,6 @@
 package com.davidandw190.mfa.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Builder;
@@ -11,6 +12,7 @@ import lombok.Data;
  */
 @Data
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class AuthenticationResponse {
 
     @JsonProperty("access_token")
@@ -22,4 +24,6 @@ public class AuthenticationResponse {
     @JsonProperty(value = "mfa_enabled")
     private boolean mfaEnabled;
 
+    @JsonProperty(value = "secret_image_uri")
+    private String secretImageUri;
 }

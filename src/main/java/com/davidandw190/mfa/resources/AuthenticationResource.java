@@ -36,8 +36,13 @@ public class AuthenticationResource {
      * @return ResponseEntity containing an AuthenticationResponse with an auth and refresh token upon success.
      */
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> registerUser(@RequestBody RegistrationRequest request) {
-        return ResponseEntity.ok(authService.registerUser(request));
+    public ResponseEntity<?> registerUser(@RequestBody RegistrationRequest request) {
+        var response = authService.registerUser(request);
+        if (request.isMfaEnabled()) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.accepted().build();
+
     }
 
     /**
@@ -56,4 +61,5 @@ public class AuthenticationResource {
         authService.refreshToken(request, response);
 
     }
+
 }

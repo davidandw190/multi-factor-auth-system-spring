@@ -10,6 +10,7 @@ import com.davidandw190.mfa.repositories.TokenRepository;
 import com.davidandw190.mfa.repositories.UserRepository;
 import com.davidandw190.mfa.services.AuthenticationService;
 import com.davidandw190.mfa.services.JwtService;
+import com.davidandw190.mfa.services.TwoFactorAuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,14 +37,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authManager;
     private final TokenRepository tokenRepository;
+    private final TwoFactorAuthenticationService tfaService;
 
     @Autowired
-    public AuthenticationServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authManager, TokenRepository tokenRepository) {
+    public AuthenticationServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authManager, TokenRepository tokenRepository, TwoFactorAuthenticationService tfaService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authManager = authManager;
         this.tokenRepository = tokenRepository;
+        this.tfaService = tfaService;
     }
 
     /**
@@ -69,10 +72,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (possiblyRegisteredUser.isPresent()) {
             throw new RuntimeException("User with email `" + request.getEmail() + "` already exists!");
         }
+
         if (request.isMfaEnabled()) {
-            // TODO Add secret generation
-            newRegisteredUser.setSecret("");
+            newRegisteredUser.setSecret(tfaService.generateNewSecret());
         }
+
         userRepository.save(newRegisteredUser);
         String jwtToken = jwtService.generateToken(newRegisteredUser);
         String refreshToken = jwtService.generateRefreshToken(newRegisteredUser);
@@ -83,6 +87,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .mfaEnabled(newRegisteredUser.isMfaEnabled())
+                .secretImageUri(tfaService.generateQrCodeImageUri(newRegisteredUser.getSecret()))
                 .build();
     }
 
@@ -100,6 +105,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 () -> new RuntimeException("User with email `" + request.getEmail() + "` was not found!")
         );
 
+        if (user.isMfaEnabled()) {
+            return AuthenticationResponse.builder()
+                    .accessToken("")
+                    .refreshToken("")
+                    .mfaEnabled(true)
+                    .build();
+        }
         revokeAllUserTokens(user);
         String jwtToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
@@ -108,6 +120,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .mfaEnabled(false)
                 .build();
     }
 
