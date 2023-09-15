@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.davidandw190.mfa</groupId>
-	<artifactId>mfa-spring</artifactId>
+	<artifactId>multi-factor-auth-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>mfa-spring</name>
-	<description>mfa-spring</description>
+	<name>multi-factor-auth-backend</name>
+	<description>multi-factor-auth-backend</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
