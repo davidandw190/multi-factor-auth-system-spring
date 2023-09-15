@@ -3,6 +3,7 @@ package com.davidandw190.mfa.resources;
 import com.davidandw190.mfa.domain.AuthenticationRequest;
 import com.davidandw190.mfa.domain.RegistrationRequest;
 import com.davidandw190.mfa.domain.AuthenticationResponse;
+import com.davidandw190.mfa.domain.VerificationRequest;
 import com.davidandw190.mfa.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -62,4 +63,8 @@ public class AuthenticationResource {
 
     }
 
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyAuthCode(@RequestBody VerificationRequest verificationRequest) {
+        return ResponseEntity.ok(authService.verifyCode(verificationRequest));
+    }
 }

@@ -3,6 +3,7 @@ package com.davidandw190.mfa.services.implementations;
 import com.davidandw190.mfa.domain.AuthenticationRequest;
 import com.davidandw190.mfa.domain.AuthenticationResponse;
 import com.davidandw190.mfa.domain.RegistrationRequest;
+import com.davidandw190.mfa.domain.VerificationRequest;
 import com.davidandw190.mfa.entities.Token;
 import com.davidandw190.mfa.entities.User;
 import com.davidandw190.mfa.enums.TokenType;
@@ -12,12 +13,14 @@ import com.davidandw190.mfa.services.AuthenticationService;
 import com.davidandw190.mfa.services.JwtService;
 import com.davidandw190.mfa.services.TwoFactorAuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -156,6 +159,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             }
         }
     }
+
+    @Override
+    public AuthenticationResponse verifyCode(VerificationRequest verificationRequest) {
+        User toBeVerifiedUser = userRepository.findUserByEmail(verificationRequest.getEmail()).orElseThrow(
+                () -> new EntityNotFoundException(String.format("No user found with %S", verificationRequest.getEmail()))
+        );
+
+        if (tfaService.isOtpNotValid(toBeVerifiedUser.getSecret(), verificationRequest.getEmail())) {
+            throw new BadCredentialsException("Incorrect code!");
+        }
+
+        var jwtToken = jwtService.generateToken(toBeVerifiedUser);
+        return AuthenticationResponse.builder()
+                .accessToken(jwtToken)
+                .mfaEnabled(toBeVerifiedUser.isMfaEnabled())
+                .build();
+    }
+
 
     private void saveUserToken(User savedUser, String jwtToken) {
         Token token = Token.builder()
